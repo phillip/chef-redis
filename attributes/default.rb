@@ -24,3 +24,7 @@ default['redis']['daemonize']    = "no"
 default['redis']['timeout']      = "300"
 default['redis']['loglevel']     = "notice"
 default['redis']['password']     = nil
+default['redis']['log_file']     = "/var/log/redis/redis-server.log"
+default['redis']['working_dir']  = "/var/lib/redis"
+default['redis']['rename_commands'] = {} # takes a hash eg: { 'FLUSHDB' => 'FLUSHDB_NEW', 'CONFIG' => '""' } 
+default['redis']['overcommit_memory'] = nil

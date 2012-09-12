@@ -1,0 +1,47 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+gem 'zk'
+require 'thread'
+require 'zk'
+
+class Events
+  def initialize 
+    @zk = ZK.new('<%= node["zookeeper"]["server_list"].map{|s| "#{s}:2181" }.join(",") %>')
+    @queue = Queue.new
+    @election_name = 'redis_<%= node["redis"]["failover"]["cluster_name"] %>_election'
+  end
+  
+  def become_master_node!
+    puts "Elected Leader"
+    puts `sed -i s/^slaveof.*//g /etc/redis/6379.conf`
+    puts `echo 'SLAVEOF NO ONE' | <%= node['redis']['source']['prefix'] %>/bin/redis-cli`
+  end
+  
+  def become_slave_of_master!
+    puts "Lost Election"
+    puts `echo 'slaveof #{@candidate.leader_data} 6379' | tee -a /etc/redis/6379.conf`
+    puts `echo 'SLAVEOF #{@candidate.leader_data} 6379' | <%= node['redis']['source']['prefix'] %>/bin/redis-cli`
+  end
+  
+  def register_for_election
+	  leader_data = `<%= node['redis']['failover']['get_hostname_cmd'] %>`.chomp
+    @candidate = @zk.election_candidate(@election_name, leader_data, :follow => :leader)
+    @candidate.on_winning_election { become_master_node! }
+    @candidate.on_losing_election { become_slave_of_master! }
+    
+    @candidate.vote!
+  end
+
+  def run
+    @queue.pop
+  end
+end
+
+begin
+  e = Events.new
+  e.register_for_election
+  e.run while true
+ensure
+  @zk.close! if @zk.methods.include?('close!')
+end

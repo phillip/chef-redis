@@ -10,7 +10,7 @@ Details http://redis.io/
 
 none
 
-Currently tested on Ubuntu 10.04 ONLY.
+Currently tested on Ubuntu 12.04 ONLY.
 
 # ATTRIBUTES:
 
@@ -21,6 +21,10 @@ Currently tested on Ubuntu 10.04 ONLY.
 	['redis']['timeout']      # "300"
 	['redis']['loglevel']     # "notice"
 	['redis']['password']     # nil
+	['redis']['log_file']     # "/var/log/redis/redis-server.log"
+  ['redis']['working_dir']  # "/var/lib/redis"
+  ['redis']['rename_commands']  # {}
+  ['redis']['overcommit_memory']# nil
 
 	['redis']['source']['version']          # "2.4.1"
 	['redis']['source']['prefix']           # "/usr/local"
@@ -29,6 +33,7 @@ Currently tested on Ubuntu 10.04 ONLY.
 	['redis']['source']['create_service']   # true
 	['redis']['source']['user']             # "redis"
 	['redis']['source']['group']            # "redis"
+	['redis']['source']['init_style']       # "init"
 
 # USAGE:
 

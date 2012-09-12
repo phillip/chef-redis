@@ -1,6 +1,7 @@
 #
 # Author:: Christian Trabold <christian.trabold@dkd.de>
 # Author:: Fletcher Nichol <fnichol@nichol.ca>
+# Author:: Phillip Goldenburg <phillip.goldenburg@sailpoint.com>
 # Cookbook Name:: redis
 # Recipe:: source
 #
@@ -72,40 +73,64 @@ end
   end
 end
 
+directory "/etc/redis" do
+  owner   "root"
+  group   "root"
+  mode    "0755"
+end
+
+template "/etc/redis/#{port}.conf" do
+  source  "redis.conf.erb"
+  owner   "root"
+  group   "root"
+  mode    "0644"
+
+  notifies :restart, "service[redis]"
+end
+
+if node['redis']['overcommit_memory']
+  bash "set_overcommit_memory" do
+    not_if `cat /proc/sys/vm/overcommit_memory`.chomp == '1'
+    code <<-COMMAND
+    echo 'vm.overcommit_memory=1' > tee /etc/sysctl.d/redis.conf
+    sysctl vm.overcommit_memory=1
+    COMMAND
+  end
+end
+
 if node['redis']['source']['create_service']
   node.set['redis']['daemonize'] = "yes"
+  if node['redis']['source']['init_style'] == "init"
+    execute "Install redis-server init.d script" do
+      command   <<-COMMAND
+        cp #{cache_dir}/#{tar_dir}/utils/redis_init_script /etc/init.d/redis
+      COMMAND
 
-  execute "Install redis-server init.d script" do
-    command   <<-COMMAND
-      cp #{cache_dir}/#{tar_dir}/utils/redis_init_script /etc/init.d/redis
-    COMMAND
+      creates   "/etc/init.d/redis"
+    end
 
-    creates   "/etc/init.d/redis"
+    file "/etc/init.d/redis" do
+      owner   "root"
+      group   "root"
+      mode    "0755"
+    end
+
+    service "redis" do
+      supports  :status => false, :restart => false, :reload => false
+      action    :enable
+    end
+  elsif node['redis']['source']['init_style'] == "upstart"
+    template "/etc/init/redis.conf" do
+      source "redis_upstart.conf.erb"
+      mode "0744"
+      owner "root"
+      group "root"
+    end
+
+    service "redis" do
+      provider Chef::Provider::Service::Upstart
+      action :enable
+    end
   end
 
-  file "/etc/init.d/redis" do
-    owner   "root"
-    group   "root"
-    mode    "0755"
-  end
-
-  service "redis" do
-    supports  :status => false, :restart => false, :reload => false
-    action    :enable
-  end
-
-  directory "/etc/redis" do
-    owner   "root"
-    group   "root"
-    mode    "0755"
-  end
-
-  template "/etc/redis/#{port}.conf" do
-    source  "redis.conf.erb"
-    owner   "root"
-    group   "root"
-    mode    "0644"
-
-    notifies :restart, "service[redis]"
-  end
 end
