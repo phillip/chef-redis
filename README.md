@@ -1,6 +1,6 @@
 # DESCRIPTION:
 
-Installs Redis. Redis is an open source, advanced key-value store. 
+Installs Redis. Redis is an open source, advanced key-value store.
 
 It is often referred to as a data structure server since keys can contain strings, hashes, lists, sets and sorted sets.
 
@@ -14,26 +14,25 @@ Currently tested on Ubuntu 12.04 ONLY.
 
 # ATTRIBUTES:
 
-	['redis']['bind']         # "127.0.0.1"
-	['redis']['port']         # "6379"
-	['redis']['config_path']  # "/etc/redis/redis.conf"
-	['redis']['daemonize']    # "no"
-	['redis']['timeout']      # "300"
-	['redis']['loglevel']     # "notice"
-	['redis']['password']     # nil
-	['redis']['log_file']     # "/var/log/redis/redis-server.log"
-  ['redis']['working_dir']  # "/var/lib/redis"
-  ['redis']['rename_commands']  # {}
-  ['redis']['overcommit_memory']# nil
-
-	['redis']['source']['version']          # "2.4.1"
-	['redis']['source']['prefix']           # "/usr/local"
-	['redis']['source']['tar_url']          # "http://redis.googlecode.com/files/redis-2.4.1.tar.gz"
-	['redis']['source']['tar_checksum']     # "38e02..."
-	['redis']['source']['create_service']   # true
-	['redis']['source']['user']             # "redis"
-	['redis']['source']['group']            # "redis"
-	['redis']['source']['init_style']       # "init"
+    ['redis']['bind']                       # "127.0.0.1"
+    ['redis']['port']                       # "6379"
+    ['redis']['config_path']                # "/etc/redis/redis.conf"
+    ['redis']['daemonize']                  # "no"
+    ['redis']['timeout']                    # "300"
+    ['redis']['loglevel']                   # "notice"
+    ['redis']['password']                   # nil
+    ['redis']['log_file']                   # "/var/log/redis/redis-server.log"
+    ['redis']['working_dir']                # "/var/lib/redis"
+    ['redis']['rename_commands']            # {}
+    ['redis']['overcommit_memory']          # nil
+    ['redis']['source']['version']          # "2.4.1"
+    ['redis']['source']['prefix']           # "/usr/local"
+    ['redis']['source']['tar_url']          # "http://redis.googlecode.com/files/redis-2.4.1.tar.gz"
+    ['redis']['source']['tar_checksum']     # "38e02..."
+    ['redis']['source']['create_service']   # true
+    ['redis']['source']['user']             # "redis"
+    ['redis']['source']['group']            # "redis"
+    ['redis']['source']['init_style']       # "init"
 
 # USAGE:
 
