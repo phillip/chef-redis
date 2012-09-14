@@ -1,0 +1,8 @@
+description "zk redis client"
+
+# automatically start
+start on filesystem
+
+exec /opt/bin/zk_redis_client >> /var/log/zk_redis_client.log 2>&1
+
+respawn

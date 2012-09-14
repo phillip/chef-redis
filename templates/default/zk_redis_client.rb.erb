@@ -1,0 +1,52 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+gem 'zk'
+require 'thread'
+require 'zk'
+
+class Events
+  def initialize 
+    @zk = ZK.new('<%= node["zookeeper"]["server_list"].map{|s| "#{s}:2181" }.join(",") %>')
+    @queue = Queue.new
+    @election_name = 'redis_<%= node["redis"]["failover"]["cluster_name"] %>_election'
+    @hostname = "redis-master"
+  end
+  
+  def set_new_leader!
+    puts "New Leader"
+    ip = `host #{@observer.leader_data}`.chomp.split(' ').last
+    new_txt = "#{ip} #{@hostname}"
+    `cat /etc/hosts |grep #{@hostname}`
+    if $?.exitstatus.zero?
+      `sed -i 's/[^ ]* #{@hostname}/#{new_txt}/g' /etc/hosts`
+    else
+      `echo '#{new_txt}' | tee -a /etc/hosts`
+    end
+    @queue.push(:got_event)
+  end
+  
+  def remove_leader!
+    puts "Lost Leader"
+    @queue.push(:got_event)
+  end
+  
+  def register_for_election
+    @observer = @zk.election_observer(@election_name)
+    @observer.on_new_leader { set_new_leader! }
+    @observer.on_leaders_death { remove_leader! }
+  end
+
+  def run
+    @observer.observe!
+    @queue.pop
+  end
+end
+
+begin
+  e = Events.new
+  e.register_for_election
+  e.run while true
+ensure
+  @zk.close! if @zk.methods.include?('close!')
+end
