@@ -18,7 +18,9 @@
 # limitations under the License.
 #
 
-gem_package "zk"
+gem_package "zk" do
+  version node['redis']['failover']['zk_version']
+end
 package "curl"
 
 directory "/opt/bin" do

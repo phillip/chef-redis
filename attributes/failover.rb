@@ -20,3 +20,4 @@
 #default["zookeeper"]["server_list"] = []
 default['redis']['failover']['cluster_name'] = "default"
 default['redis']['failover']['get_hostname_cmd'] = "curl -s http://169.254.169.254/latest/meta-data/public-hostname" # or hostname
+default['redis']['failover']['zk_version'] = '>=1.7.1'
