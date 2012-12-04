@@ -90,7 +90,7 @@ end
 
 if node['redis']['overcommit_memory']
   bash "set_overcommit_memory" do
-    not_if `cat /proc/sys/vm/overcommit_memory`.chomp == '1'
+    not_if {`cat /proc/sys/vm/overcommit_memory`.chomp == '1'}
     code <<-COMMAND
     echo 'vm.overcommit_memory=1' > tee /etc/sysctl.d/redis.conf
     sysctl vm.overcommit_memory=1
