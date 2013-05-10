@@ -79,13 +79,12 @@ directory "/etc/redis" do
   mode    "0755"
 end
 
-template "/etc/redis/#{port}.conf" do
+template "/etc/redis/#{node['redis']['port']}.conf" do
   source  "redis.conf.erb"
   owner   "root"
   group   "root"
   mode    "0644"
-
-  notifies :restart, "service[redis]"
+  action :create_if_missing
 end
 
 if node['redis']['overcommit_memory']
@@ -129,8 +128,7 @@ if node['redis']['source']['create_service']
 
     service "redis" do
       provider Chef::Provider::Service::Upstart
-      action :enable
+      action [:enable,:start]
     end
   end
-
 end
