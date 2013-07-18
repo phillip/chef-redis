@@ -79,8 +79,10 @@ directory "/etc/redis" do
   mode    "0755"
 end
 
+gte_2_6 = Gem::Version.new(node['redis']['source']['version']) >= Gem::Version.new('2.6.0')
+
 template "/etc/redis/#{node['redis']['port']}.conf" do
-  source  "redis.conf.erb"
+  source  (gte_2_6 ? "redis-2.6.conf.erb" : "redis.conf.erb")
   owner   "root"
   group   "root"
   mode    "0644"
