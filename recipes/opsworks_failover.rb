@@ -18,7 +18,9 @@
 # limitations under the License.
 #
 
-oldest_host = node[:opsworks][:layers][:redis][:instances].sort_by{ |k, v| v[:booted_at] }.first[0]
+layers = node[:opsworks][:instance][:layers]
+layer_name = layers.select{|l| l.include?("redis") }.first || layers.first
+oldest_host = node[:opsworks][:layers][layer_name.to_sym][:instances].sort_by{ |k, v| v[:booted_at] }.first[0]
 if oldest_host == node[:opsworks][:instance][:hostname]
   bash "set_master" do
     user "root"
